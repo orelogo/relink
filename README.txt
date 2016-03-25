@@ -1,0 +1,1 @@
+Relink is an android app that keeps you connected with friends. It reminds you to contact friends at chosen intervals.
