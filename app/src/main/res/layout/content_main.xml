@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.orelogo.relink.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <EditText android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/contact_name" />
+
+    <EditText android:id="@+id/last_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/last_connect" />
+
+    <EditText android:id="@+id/next_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/next_connect" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/submit_button"
+        android:onClick="addContact"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/view_button"
+        android:onClick="viewDatabase"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear_table"
+        android:onClick="clearTable"/>
+
+    <TextView android:id="@+id/database_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_message" />
+
+</LinearLayout>

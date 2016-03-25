@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Relink</string>
+    <string name="action_settings">Settings</string>
+    <string name="contact_name">Contact name</string>
+    <string name="last_connect">Last connect</string>
+    <string name="next_connect">Next connect</string>
+    <string name="submit_button">Submit</string>
+    <string name="view_button">View database</string>
+    <string name="clear_table">Clear table</string>
+    <string name="default_message">Nothing to see here</string>
+</resources>
