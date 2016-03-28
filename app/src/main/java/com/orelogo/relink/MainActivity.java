@@ -1,6 +1,7 @@
 package com.orelogo.relink;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -13,6 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,11 +36,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         db = new DBAdapter(this);
         db.open();
+        viewDatabase();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         db.close();
     }
 
@@ -61,25 +67,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void addContact(View view) {
-
-        EditText nameField = (EditText) findViewById(R.id.name);
-        String name = nameField.getText().toString();
-
-        EditText lastConnectField = (EditText) findViewById(R.id.last_connect);
-        int lastConnect = Integer.parseInt( lastConnectField.getText().toString() );
-
-        EditText nextConnectField = (EditText) findViewById(R.id.next_connect);
-        int nextConnect = Integer.parseInt(nextConnectField.getText().toString());
-
-        db.insertRow(name, lastConnect, nextConnect);
-
-        TextView databaseView = (TextView) findViewById(R.id.database_view);
-        databaseView.setText("Contact added!");
-
-    }
-
-    public void viewDatabase(View view) {
+    public void viewDatabase() {
 
         TextView databaseView = (TextView) findViewById(R.id.database_view);
         String databaseItems = "";
@@ -89,11 +77,14 @@ public class MainActivity extends AppCompatActivity {
         if (cursor != null && cursor.getCount() > 0) {
             do {
                 String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
-                int lastConnect = cursor.getInt(DBAdapter.COL_LAST_CONNECT_INDEX);
-                int nextConnect = cursor.getInt(DBAdapter.COL_NEXT_CONNECT_INDEX);
+                long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
+                long nextConnectMillis = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
 
-                databaseItems += "Name: " + name + ", Last Connect: " + lastConnect + ", Next Conect: " +
-                        nextConnect + "\n";
+                Date nextConnectDate = new Date(nextConnectMillis);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String nextConnect = sdf.format(nextConnectDate);
+
+                databaseItems += name + ", " + nextConnect + "\n";
             } while (cursor.moveToNext());
 
             databaseView.setText(databaseItems);
@@ -108,4 +99,11 @@ public class MainActivity extends AppCompatActivity {
         TextView databaseView = (TextView) findViewById(R.id.database_view);
         databaseView.setText("Cleared table!");
     }
+
+    public void addContact(View view) {
+
+        Intent intent = new Intent(this, AddContact.class);
+        startActivity(intent);
+    }
+
 }

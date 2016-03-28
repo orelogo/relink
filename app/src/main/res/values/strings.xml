@@ -8,4 +8,7 @@
     <string name="view_button">View database</string>
     <string name="clear_table">Clear table</string>
     <string name="default_message">Nothing to see here</string>
+    <string name="connect_interval">Connect every</string>
+    <string name="months">months</string>
+    <string name="title_activity_add_contact">Add Contact</string>
 </resources>

@@ -3,4 +3,4 @@
 Committed
 ---------
 
-Functional database test
+Functional test database

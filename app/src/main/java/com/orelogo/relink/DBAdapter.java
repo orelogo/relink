@@ -49,7 +49,7 @@ public class DBAdapter {
         dbHelper.close();
     }
 
-    public long insertRow(String name, int lastConnect, int nextConnect) {
+    public long insertRow(String name, long lastConnect, long nextConnect) {
         ContentValues values = new ContentValues();
         values.put(COL_NAME, name);
         values.put(COL_LAST_CONNECT, lastConnect);
