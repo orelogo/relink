@@ -3,4 +3,11 @@
 Committed
 ---------
 
+Change main activity to ListView
+  - use SimpleDisplayCursor to display each item from database
+  - display name and remaining time to connect
+  - change add sign on FAB
+
+Add AddContact activity
+
 Functional test database
