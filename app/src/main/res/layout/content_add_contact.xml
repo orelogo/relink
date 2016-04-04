@@ -18,6 +18,12 @@
         android:layout_height="wrap_content"
         android:hint="@string/contact_name" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/from_contacts"
+        android:onClick="pickContact"/>
+
     <EditText android:id="@+id/connect_interval"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

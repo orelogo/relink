@@ -15,10 +15,11 @@ build/
 local.properties
 gradle.properties
 
-
-#IntelliJ project files
+# IntelliJ project files
 .idea
 *.iml
 .DS_Store
 captures
 
+# other
+previous_commits.txt

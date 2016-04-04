@@ -4,12 +4,12 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -18,7 +18,13 @@ import java.util.Date;
 
 public class MainActivity extends ListActivity {
 
-    private DBAdapter db;    // database adapter for interacting with database
+    DBAdapter db = new DBAdapter(this); // assign database adapter
+    Cursor cursor;                      // cursor for database information
+    static final long YEAR_MS = 31_557_600_000L; // milliseconds in an average year (assuming 365.25 days)
+    // milliseconds in an average month (assuming 365.25/12 days)
+    static final long MONTH_MS = 2_629_800_000L;
+    static final int WEEK_MS = 604_800_000; // milliseconds in a week
+    static final int DAY_MS = 86_400_000;   // milliseconds in a day
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +37,6 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        db = new DBAdapter(this); // assign database adapter
-        db.open();
         loadListView();
     }
 
@@ -40,6 +44,7 @@ public class MainActivity extends ListActivity {
     protected void onPause() {
         super.onPause();
         db.close();
+        cursor.close();
     }
 
     @Override
@@ -74,7 +79,7 @@ public class MainActivity extends ListActivity {
         TextView databaseView = (TextView) findViewById(R.id.database_view);
         String databaseItems = "";
 
-        Cursor cursor = db.getAllRows();
+        cursor = db.getAllRows();
 
         if (cursor != null && cursor.getCount() > 0) {
             do {
@@ -114,7 +119,6 @@ public class MainActivity extends ListActivity {
      * @param view view that was clicked
      */
     public void addContact(View view) {
-
         Intent intent = new Intent(this, AddContact.class);
         startActivity(intent);
     }
@@ -127,11 +131,13 @@ public class MainActivity extends ListActivity {
         String[] fromColumns = {DBAdapter.COL_NAME, DBAdapter.COL_NEXT_CONNECT};
         int[] toViews = {R.id.name, R.id.next_connect};
 
-        Cursor cursor = db.getAllRows(); // get all rows from database
+        db.open();
+        cursor = db.getAllRows();    // get all rows from database
 
-        // adapter to populate ListView with database data, each item follows the list_item layout
+        // adapter to populate ListView with database data, each item follows the main list_item
+        // layout
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-                R.layout.list_item, cursor, fromColumns, toViews, 0);
+                R.layout.main_list_item, cursor, fromColumns, toViews, 0);
 
         // modify data from database to display time remaining to next connect
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
@@ -154,57 +160,48 @@ public class MainActivity extends ListActivity {
     }
 
     /**
-     * Get the amount of time remaining (in years, months, weeks, days) until you need to connect
-     * with contact.
+     * Get the amount of time remaining (in years, months, weeks, or days) until you need to
+     * connect with contact.
      *
-     * @param nextConnect epoch time when to connect
-     * @return time countdown when to connect
+     * @param nextConnect time when to connect, in unix time
+     * @return time remaining when to connect
      */
     private String getTimeRemaining(long nextConnect) {
 
-        String connectCountdown = "";
+        double timeRemaining = 0; // number of years, months, weeks, or days remaining
+        char timeScale = 'x';     // scale of time, ie. y year, m month, w week, or d day
 
-        int y = 0;  // number of years, months, weeks, days
-        int m = 0;
-        int w = 0;
-        int d = 0;
-
-        // amount of days remaining from right now
-        int daysRemaining = (int) Math.floor(
-                (nextConnect - System.currentTimeMillis()) / 86_400_000);
+        // amount of milliseconds remaining from right now
+        double msRemaining = nextConnect - System.currentTimeMillis();
 
         // extract number of years, months, and weeks
-        if (daysRemaining >= 365) {
-            y = daysRemaining / 365;
-            daysRemaining = daysRemaining % 365;
+        if (msRemaining >= YEAR_MS) {
+            timeRemaining = (msRemaining / YEAR_MS);
+            timeScale = 'y';
         }
-        if (daysRemaining >= 30) {
-            m = daysRemaining / 30;
-            daysRemaining = daysRemaining % 30;
+        else if (msRemaining >= MONTH_MS) {
+            timeRemaining = (msRemaining / MONTH_MS);
+            timeScale = 'm';
         }
-        if (daysRemaining >= 7) {
-            w = daysRemaining / 7;
-            daysRemaining = daysRemaining % 7;
+        else if (msRemaining >= WEEK_MS) {
+            timeRemaining = (msRemaining / WEEK_MS);
+            timeScale = 'w';
         }
-        if (daysRemaining >= 1) {
-            d = daysRemaining;
-        }
-
-        // build string of time remaining
-        if (y > 0) {
-            connectCountdown += y + "y ";
-        }
-        if (m > 0) {
-            connectCountdown += m + "m ";
-        }
-        if (w > 0) {
-            connectCountdown += w + "w ";
-        }
-        if (d > 0) {
-            connectCountdown += d + "d ";
+        else if (msRemaining >= DAY_MS) {
+            timeRemaining = (msRemaining / DAY_MS);
+            timeScale = 'd';
         }
 
-        return connectCountdown.trim();
+        // round to single decimal place
+        timeRemaining = Math.round(timeRemaining * 10) / 10.0;
+
+        // build string
+        String timeRemainingFinal = "due"; // default value
+        if (timeRemaining > 0) {         // if there is time remaining
+            timeRemainingFinal = timeRemaining + " " + timeScale;
+        }
+
+        return timeRemainingFinal;
     }
 
 }

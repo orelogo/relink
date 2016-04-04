@@ -14,20 +14,23 @@ public class DBAdapter {
         dbHelper = new DBHelper(context);
     }
 
-    public static final String TABLE_NAME = "contacts";
-    public static final String COL_ID = "_id";
-    public static final String COL_NAME = "name";  // contact name
-    public static final String COL_LAST_CONNECT = "lastConnect"; // date of last connection
-    public static final String COL_NEXT_CONNECT = "nextConnect"; // date of next connection
+    static final String TABLE_NAME = "contacts";          // table name
+    static final String COL_ID = "_id";                   // id column
+    static final String COL_NAME = "name";                // contact name
+    static final String COL_LAST_CONNECT = "lastConnect"; // date of last connection
+    static final String COL_NEXT_CONNECT = "nextConnect"; // date of next connection
 
-    public static final int COL_ID_INDEX = 0;
-    public static final int COL_NAME_INDEX = 1;  // contact name
-    public static final int COL_LAST_CONNECT_INDEX = 2; // date of last connection
-    public static final int COL_NEXT_CONNECT_INDEX = 3; // date of next connection
+    // column indexes
+    static final int COL_ID_INDEX = 0;
+    static final int COL_NAME_INDEX = 1;
+    static final int COL_LAST_CONNECT_INDEX = 2;
+    static final int COL_NEXT_CONNECT_INDEX = 3;
 
-    public static final String[] ALL_COL = new String[] {
+    // all column names
+    private static final String[] ALL_COL = new String[] {
             COL_ID, COL_NAME, COL_LAST_CONNECT, COL_NEXT_CONNECT};
 
+    // SQL code to generate table
     private static final String SQL_CREATE_ENTRIES =
         "CREATE TABLE " + TABLE_NAME + " (" +
         COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -35,21 +38,36 @@ public class DBAdapter {
         COL_LAST_CONNECT + " DATE, " +
         COL_NEXT_CONNECT + " DATE" + ");";
 
+    // SQL code to delete table
     private static final String SQL_DELETE_ENTRIES =
         "DROP TABLE IF EXISTS" + TABLE_NAME;
 
     private SQLiteDatabase db;
     private DBHelper dbHelper;
 
-    public void open() {
+    /**
+     * Open database.
+     */
+    void open() {
         db = dbHelper.getWritableDatabase();
     }
 
-    public void close() {
+    /**
+     * Close database.
+     */
+    void close() {
         dbHelper.close();
     }
 
-    public long insertRow(String name, long lastConnect, long nextConnect) {
+    /**
+     * Insert row into database.
+     *
+     * @param name contact name
+     * @param lastConnect time of last connect, in unix time
+     * @param nextConnect time of when to connect next, in unix time
+     * @return the row ID of the newly inserted row, or -1 if an error occurred
+     */
+    long insertRow(String name, long lastConnect, long nextConnect) {
         ContentValues values = new ContentValues();
         values.put(COL_NAME, name);
         values.put(COL_LAST_CONNECT, lastConnect);
@@ -58,23 +76,42 @@ public class DBAdapter {
         return db.insert(TABLE_NAME, null, values);
     }
 
-    public boolean deleteRow(long rowId) {
+    /**
+     * Delete row.
+     *
+     * @param rowId row ID
+     * @return the number of rows affected if a whereClause is passed in, 0 otherwise.
+     *         To remove all rows and get a count pass "1" as the whereClause.
+     */
+    boolean deleteRow(long rowId) {
         String where = COL_ID + "=" + rowId;
         return db.delete(TABLE_NAME, where, null) != 0;
     }
 
-    public void deleteAll() {
+    /**
+     * Delete all rows.
+     */
+    void deleteAll() {
         db.delete(TABLE_NAME, null, null);
     }
 
-    public Cursor getAllRows() {
-        Cursor c = db.query(true, TABLE_NAME, ALL_COL, null, null, null, null, null, null);
+    /**
+     * Get cursor with all rows and columns.
+     *
+     * @return cursor with all rows and columns
+     */
+    Cursor getAllRows() {
+        String orderBy = COL_NEXT_CONNECT + " ASC"; // order cursor by nextConnect time
+        Cursor c = db.query(true, TABLE_NAME, ALL_COL, null, null, null, null, orderBy, null);
         if (c != null) {
             c.moveToFirst();
         }
         return c;
     }
 
+    /**
+     * Database helper class for creating, version management, opening and closing.
+     */
     private class DBHelper extends SQLiteOpenHelper {
 
         public static final int DATABASE_VERSION = 1;
