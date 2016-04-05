@@ -30,10 +30,9 @@
         android:hint="@string/connect_interval"
         android:inputType="numberDecimal" />
 
-    <TextView
+    <Spinner android:id="@+id/time_scale_spinner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/months"/>
+        android:layout_height="wrap_content" />
 
     <Button
         android:layout_width="wrap_content"

@@ -11,4 +11,11 @@
     <string name="connect_interval">Connect every</string>
     <string name="months">months</string>
     <string name="title_activity_add_contact">Add Contact</string>
+    <string name="from_contacts">From Contacts</string>
+    <string-array name="time_scale_array">
+        <item>Days</item>
+        <item>Weeks</item>
+        <item>Months</item>
+        <item>Years</item>
+    </string-array>
 </resources>

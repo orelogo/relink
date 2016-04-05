@@ -1,7 +1,10 @@
 package com.orelogo.relink;
 
 import android.app.ListActivity;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -16,10 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     DBAdapter db = new DBAdapter(this); // assign database adapter
-    Cursor cursor;                      // cursor for database information
+    SimpleCursorAdapter adapter; // adapter to populate ListView with database data
+    private static final int CONTACTS_LOADER = 0; // identifies loader being used
+
     static final long YEAR_MS = 31_557_600_000L; // milliseconds in an average year (assuming 365.25 days)
     // milliseconds in an average month (assuming 365.25/12 days)
     static final long MONTH_MS = 2_629_800_000L;
@@ -38,13 +43,14 @@ public class MainActivity extends ListActivity {
     protected void onStart() {
         super.onStart();
         loadListView();
+        // initiate loader for database query
+        getLoaderManager().restartLoader(CONTACTS_LOADER, null, this);
+
     }
 
         @Override
     protected void onPause() {
         super.onPause();
-        db.close();
-        cursor.close();
     }
 
     @Override
@@ -69,6 +75,37 @@ public class MainActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        switch (id) {
+            case CONTACTS_LOADER:
+                // create new cursor loader to querying database
+                return new CursorLoader(this) {
+                    @Override
+                    public Cursor loadInBackground() {
+                        db.open();
+                        Cursor cursor =  db.getAllRows();    // cursor with all rows
+                        db.close();
+                        return cursor;
+                    }
+                };
+            default:
+                // an invalid id was passed in
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.changeCursor(data); // change cursor when query complete
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.changeCursor(null);
+    }
+
     /**
      * For testing: View database.
      *
@@ -79,7 +116,9 @@ public class MainActivity extends ListActivity {
         TextView databaseView = (TextView) findViewById(R.id.database_view);
         String databaseItems = "";
 
-        cursor = db.getAllRows();
+        db.open();
+        Cursor cursor = db.getAllRows();
+        db.close();
 
         if (cursor != null && cursor.getCount() > 0) {
             do {
@@ -108,7 +147,10 @@ public class MainActivity extends ListActivity {
      * @param view button pressed
      */
     public void clearTable(View view) {
+        db.open();
         db.deleteAll();
+        db.close();
+        getLoaderManager().restartLoader(CONTACTS_LOADER, null, this);
         TextView databaseView = (TextView) findViewById(R.id.database_view);
         databaseView.setText("Cleared table!");
     }
@@ -127,17 +169,15 @@ public class MainActivity extends ListActivity {
      * Load list view.
      */
     private void loadListView() {
+
         // variables for generating ListView via SimpleCursorAdapter
         String[] fromColumns = {DBAdapter.COL_NAME, DBAdapter.COL_NEXT_CONNECT};
         int[] toViews = {R.id.name, R.id.next_connect};
 
-        db.open();
-        cursor = db.getAllRows();    // get all rows from database
-
         // adapter to populate ListView with database data, each item follows the main list_item
         // layout
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-                R.layout.main_list_item, cursor, fromColumns, toViews, 0);
+        adapter = new SimpleCursorAdapter(this,
+                R.layout.main_list_item, null, fromColumns, toViews, 0);
 
         // modify data from database to display time remaining to next connect
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
@@ -167,7 +207,6 @@ public class MainActivity extends ListActivity {
      * @return time remaining when to connect
      */
     private String getTimeRemaining(long nextConnect) {
-
         double timeRemaining = 0; // number of years, months, weeks, or days remaining
         char timeScale = 'x';     // scale of time, ie. y year, m month, w week, or d day
 
@@ -176,29 +215,39 @@ public class MainActivity extends ListActivity {
 
         // extract number of years, months, and weeks
         if (msRemaining >= YEAR_MS) {
-            timeRemaining = (msRemaining / YEAR_MS);
             timeScale = 'y';
+            timeRemaining = (msRemaining / YEAR_MS);
+            // round to ones column
+            timeRemaining = Math.round(timeRemaining);
         }
         else if (msRemaining >= MONTH_MS) {
-            timeRemaining = (msRemaining / MONTH_MS);
             timeScale = 'm';
+            timeRemaining = (msRemaining / MONTH_MS);
+            timeRemaining = Math.round(timeRemaining);
+            if (timeRemaining >= 12){
+                timeRemaining = 1;
+                timeScale = 'y';
+            }
         }
         else if (msRemaining >= WEEK_MS) {
-            timeRemaining = (msRemaining / WEEK_MS);
             timeScale = 'w';
+            timeRemaining = (msRemaining / WEEK_MS);
+            timeRemaining = Math.round(timeRemaining);
         }
         else if (msRemaining >= DAY_MS) {
             timeRemaining = (msRemaining / DAY_MS);
             timeScale = 'd';
+            timeRemaining = Math.round(timeRemaining);
+            if (timeRemaining >= 7){
+                timeRemaining = 1;
+                timeScale = 'w';
+            }
         }
-
-        // round to single decimal place
-        timeRemaining = Math.round(timeRemaining * 10) / 10.0;
 
         // build string
         String timeRemainingFinal = "due"; // default value
-        if (timeRemaining > 0) {         // if there is time remaining
-            timeRemainingFinal = timeRemaining + " " + timeScale;
+        if (timeRemaining > 0) {           // if there is time remaining
+            timeRemainingFinal = (int) timeRemaining + " " + timeScale;
         }
 
         return timeRemainingFinal;
