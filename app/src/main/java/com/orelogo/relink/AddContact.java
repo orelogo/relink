@@ -106,52 +106,97 @@ public class AddContact extends AppCompatActivity {
      */
     public void addContact(View view) {
 
-        DBAdapter db = new DBAdapter(this); // database adapter for interacting with database
-        db.open();
+        if (isInputValid()) {
+            // get name from user
+            EditText nameField = (EditText) findViewById(R.id.name);
+            String name = nameField.getText().toString();
 
-        // get name from user
-        EditText nameField = (EditText) findViewById(R.id.name);
-        String name = nameField.getText().toString();
+            // get connect time interval from user
+            EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
+            Double connectInterval = Double.parseDouble(
+                    connectIntervalField.getText().toString());
 
-        // get connect time interval from user
-        EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
-        Double connectIntervalMonths = Double.parseDouble(
-                connectIntervalField.getText().toString());
+            // get time in milliseconds based on user selected time scale spinner
+            long time_ms; // time in a day, week, month, or year (in ms)
+            String timeScale = timeScaleSpinner.getSelectedItem().toString();
 
-        // get time in milliseconds based on user selected time scale spinner
-        long time_ms; // time in milliseconds
-        String timeScale = timeScaleSpinner.getSelectedItem().toString();
+            switch (timeScale) {
+                case "Days":
+                    time_ms = MainActivity.DAY_MS;
+                    break;
+                case "Weeks":
+                    time_ms = MainActivity.WEEK_MS;
+                    break;
+                case "Months":
+                    time_ms = MainActivity.MONTH_MS;
+                    break;
+                case "Years":
+                    time_ms = MainActivity.YEAR_MS;
+                    break;
+                default: // an error occurred
+                    time_ms = 0;
+                    break;
+            }
 
-        switch (timeScale) {
-            case "Days":
-                time_ms = MainActivity.DAY_MS;
-                break;
-            case "Weeks":
-                time_ms = MainActivity.WEEK_MS;
-                break;
-            case "Months":
-                time_ms = MainActivity.MONTH_MS;
-                break;
-            case "Years":
-                time_ms = MainActivity.YEAR_MS;
-                break;
-            default: // an error occurred
-                time_ms = 0;
-                break;
+            // calculate time to next connect
+            long currentTime =  System.currentTimeMillis();
+            long intervalTime = (long) Math.floor(connectInterval * time_ms);
+            long nextConnect = currentTime + intervalTime;// time for next connect (in milliseconds)
+
+            // add name and next connect time to database
+            DBAdapter db = new DBAdapter(this); // database adapter for interacting with database
+            db.open();
+            db.insertRow(name, currentTime, nextConnect);
+            db.close();
+            finish(); // finish activity
         }
 
-        // calculate time to next connect
-        long currentTime =  System.currentTimeMillis();
-        long intervalTime = (long) Math.floor(connectIntervalMonths * time_ms);
-        long nextConnect = currentTime + intervalTime; // time for next connect (in milliseconds)
 
-        // add name and next connect time to database
-        db.insertRow(name, currentTime, nextConnect);
+    }
 
-        TextView databaseView = (TextView) findViewById(R.id.database_view);
-        databaseView.setText("Contact added!");
+    /**
+     * Determines if user input is valid.
+     *
+     * @return true if user supplied valid input, otherwise, false
+     */
+    private boolean isInputValid() {
 
-        db.close();
-        finish(); // finish activity
+        // field to display error message
+        TextView errorField = (TextView) findViewById(R.id.add_contact_error);
+        String errorText = ""; // error message
+
+        // check if user supplied a name
+        EditText nameField = (EditText) findViewById(R.id.name);
+        String name = nameField.getText().toString();
+        if (name.length() == 0 ) {
+            errorText += "Please enter a name.";
+        }
+
+        // check if user supplied a valid number, 0 considered valid
+        EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
+        try {
+            Double connectInterval = Double.parseDouble(connectIntervalField.getText().toString());
+            if (connectInterval < 0) {
+                if (errorText.length() > 0) {
+                    errorText += "\n";
+                }
+                errorText += "Please enter a valid number.";
+            }
+        }
+        catch (NumberFormatException e) { // occurs if no value is entered
+            if (errorText.length() > 0) {
+                errorText += "\n";
+            }
+            errorText += "Please enter a valid number.";
+        }
+
+
+        if (errorText.length() == 0) {
+            return true;
+        }
+        else {
+            errorField.setText(errorText); // display error message
+            return false;
+        }
     }
 }
