@@ -24,7 +24,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/contact_name"
             android:layout_weight="1"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:inputType="textPersonName" />
 
         <Button
             android:layout_width="wrap_content"
@@ -43,8 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/connect_every"
-            android:id="@+id/textView2" />
+            android:text="@string/connect_every" />
 
         <EditText android:id="@+id/connect_interval"
             android:layout_width="wrap_content"

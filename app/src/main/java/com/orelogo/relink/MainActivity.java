@@ -31,6 +31,20 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     static final int WEEK_MS = 604_800_000; // milliseconds in a week
     static final int DAY_MS = 86_400_000;   // milliseconds in a day
 
+    // time scale constants
+    static final char DAYS = 'd';
+    static final char WEEKS = 'w';
+    static final char MONTHS = 'm';
+    static final char YEARS = 'y';
+
+    // for passing contact information in an intent
+    static final String ROW_ID = "com.orelogo.relink.ROW_ID";
+    static final String NAME = "com.orelogo.relink.NAME";
+    static final String LAST_CONNECT = "com.orelogo.relink.LAST_CONNECT";
+    static final String NEXT_CONNECT = "com.orelogo.relink.NEXT_CONNECT";
+    static final String CONNECT_INTERVAL = "com.orelogo.relink.CONNECT_INTERVAL";
+    static final String TIME_SCALE = "com.orelogo.relink.TIME_SCALE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,6 +179,36 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         startActivity(intent);
     }
 
+
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+
+        Cursor cursor = (Cursor) getListView().getItemAtPosition(position);
+
+        // get information about contact
+        int rowId = cursor.getInt(DBAdapter.COL_ID_INDEX);
+        String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
+        long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
+        long nextConnect = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
+        double connectInterval = cursor.getDouble(DBAdapter.COL_CONNECT_INTERVAL_INDEX);
+        char timeScale = cursor.getString(DBAdapter.COL_TIME_SCALE_INDEX).charAt(0);
+
+        cursor.close();
+
+        Intent intent = new Intent(this, EditContact.class);
+
+        // pass contact information into intent
+        intent.putExtra(ROW_ID, rowId);
+        intent.putExtra(NAME, name);
+        intent.putExtra(LAST_CONNECT, lastConnect);
+        intent.putExtra(NEXT_CONNECT, nextConnect);
+        intent.putExtra(CONNECT_INTERVAL, connectInterval);
+        intent.putExtra(TIME_SCALE, timeScale);
+
+        startActivity(intent);
+    }
+
     /**
      * Load list view.
      */
@@ -188,7 +232,9 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
                     long nextConnect = cursor.getLong(colIndex); // time of next connect
 
                     TextView nextConnectCountdown = (TextView) view;
-                    nextConnectCountdown.setText(getTimeRemaining(nextConnect));
+                    // get time remaining from unix time
+                    String timeRemaining = getTimeRemaining(nextConnect);
+                    nextConnectCountdown.setText(timeRemaining);
                     return true;
                 }
                 return false;
@@ -215,32 +261,32 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
 
         // extract number of years, months, and weeks
         if (msRemaining >= YEAR_MS) {
-            timeScale = 'y';
+            timeScale = YEARS;
             timeRemaining = (msRemaining / YEAR_MS);
             // round to ones column
             timeRemaining = Math.round(timeRemaining);
         }
         else if (msRemaining >= MONTH_MS) {
-            timeScale = 'm';
+            timeScale = MONTHS;
             timeRemaining = (msRemaining / MONTH_MS);
             timeRemaining = Math.round(timeRemaining);
             if (timeRemaining >= 12){
                 timeRemaining = 1;
-                timeScale = 'y';
+                timeScale = YEARS;
             }
         }
         else if (msRemaining >= WEEK_MS) {
-            timeScale = 'w';
+            timeScale = WEEKS;
             timeRemaining = (msRemaining / WEEK_MS);
             timeRemaining = Math.round(timeRemaining);
         }
         else if (msRemaining >= DAY_MS) {
             timeRemaining = (msRemaining / DAY_MS);
-            timeScale = 'd';
+            timeScale = DAYS;
             timeRemaining = Math.round(timeRemaining);
             if (timeRemaining >= 7){
                 timeRemaining = 1;
-                timeScale = 'w';
+                timeScale = WEEKS;
             }
         }
 

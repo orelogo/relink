@@ -118,23 +118,29 @@ public class AddContact extends AppCompatActivity {
 
             // get time in milliseconds based on user selected time scale spinner
             long time_ms; // time in a day, week, month, or year (in ms)
-            String timeScale = timeScaleSpinner.getSelectedItem().toString();
+            char timeScale; // time scale to be used with interval value
+            String timeScaleValue = timeScaleSpinner.getSelectedItem().toString();
 
-            switch (timeScale) {
+            switch (timeScaleValue) {
                 case "Days":
                     time_ms = MainActivity.DAY_MS;
+                    timeScale = MainActivity.DAYS;
                     break;
                 case "Weeks":
                     time_ms = MainActivity.WEEK_MS;
+                    timeScale = MainActivity.WEEKS;
                     break;
                 case "Months":
                     time_ms = MainActivity.MONTH_MS;
+                    timeScale = MainActivity.MONTHS;
                     break;
                 case "Years":
                     time_ms = MainActivity.YEAR_MS;
+                    timeScale = MainActivity.YEARS;
                     break;
                 default: // an error occurred
                     time_ms = 0;
+                    timeScale = 'x';
                     break;
             }
 
@@ -146,7 +152,8 @@ public class AddContact extends AppCompatActivity {
             // add name and next connect time to database
             DBAdapter db = new DBAdapter(this); // database adapter for interacting with database
             db.open();
-            db.insertRow(name, currentTime, nextConnect);
+            String timeScaleString = String.valueOf(timeScale);
+            db.insertRow(name, currentTime, nextConnect, connectInterval, timeScaleString);
             db.close();
             finish(); // finish activity
         }

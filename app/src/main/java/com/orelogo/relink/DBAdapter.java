@@ -19,16 +19,21 @@ public class DBAdapter {
     static final String COL_NAME = "name";                // contact name
     static final String COL_LAST_CONNECT = "lastConnect"; // date of last connection
     static final String COL_NEXT_CONNECT = "nextConnect"; // date of next connection
+    static final String COL_CONNECT_INTERVAL = "connectInterval"; // connect interval
+    static final String COL_TIME_SCALE = "timeScale"; // time scale of connect interval
 
     // column indexes
     static final int COL_ID_INDEX = 0;
     static final int COL_NAME_INDEX = 1;
     static final int COL_LAST_CONNECT_INDEX = 2;
     static final int COL_NEXT_CONNECT_INDEX = 3;
+    static final int COL_CONNECT_INTERVAL_INDEX = 4;
+    static final int COL_TIME_SCALE_INDEX = 5;
+
 
     // all column names
-    private static final String[] ALL_COL = new String[] {
-            COL_ID, COL_NAME, COL_LAST_CONNECT, COL_NEXT_CONNECT};
+    private static final String[] ALL_COL = new String[] {COL_ID, COL_NAME, COL_LAST_CONNECT,
+            COL_NEXT_CONNECT, COL_CONNECT_INTERVAL, COL_TIME_SCALE};
 
     // SQL code to generate table
     private static final String SQL_CREATE_ENTRIES =
@@ -36,11 +41,13 @@ public class DBAdapter {
         COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         COL_NAME + " TEXT, " +
         COL_LAST_CONNECT + " DATE, " +
-        COL_NEXT_CONNECT + " DATE" + ");";
+        COL_NEXT_CONNECT + " DATE, " +
+        COL_CONNECT_INTERVAL + " REAL, " +
+        COL_TIME_SCALE + " CHAR(1)" + ");";
 
     // SQL code to delete table
     private static final String SQL_DELETE_ENTRIES =
-        "DROP TABLE IF EXISTS" + TABLE_NAME;
+        "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     private SQLiteDatabase db;
     private DBHelper dbHelper;
@@ -67,11 +74,14 @@ public class DBAdapter {
      * @param nextConnect time of when to connect next, in unix time
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
-    long insertRow(String name, long lastConnect, long nextConnect) {
+    long insertRow(String name, long lastConnect, long nextConnect, double connectInterval,
+                   String timeScale) {
         ContentValues values = new ContentValues();
         values.put(COL_NAME, name);
         values.put(COL_LAST_CONNECT, lastConnect);
         values.put(COL_NEXT_CONNECT, nextConnect);
+        values.put(COL_CONNECT_INTERVAL, connectInterval);
+        values.put(COL_TIME_SCALE, timeScale);
 
         return db.insert(TABLE_NAME, null, values);
     }
@@ -114,7 +124,7 @@ public class DBAdapter {
      */
     private class DBHelper extends SQLiteOpenHelper {
 
-        public static final int DATABASE_VERSION = 1;
+        public static final int DATABASE_VERSION = 2; // increase value when changing database
         public static final String DATABASE_NAME = "relink.db";
 
         DBHelper(Context context) {
