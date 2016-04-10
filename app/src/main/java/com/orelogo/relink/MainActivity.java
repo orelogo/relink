@@ -1,16 +1,17 @@
 package com.orelogo.relink;
 
-import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -19,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     DBAdapter db = new DBAdapter(this); // assign database adapter
     SimpleCursorAdapter adapter; // adapter to populate ListView with database data
@@ -32,12 +33,12 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     static final int DAY_MS = 86_400_000;   // milliseconds in a day
 
     // time scale constants
-    static final char DAYS = 'd';
-    static final char WEEKS = 'w';
-    static final char MONTHS = 'm';
-    static final char YEARS = 'y';
+    static final String DAYS = "d";
+    static final String WEEKS = "w";
+    static final String MONTHS = "m";
+    static final String YEARS = "y";
 
-    // for passing contact information in an intent
+    // for passing reminder information in an intent
     static final String ROW_ID = "com.orelogo.relink.ROW_ID";
     static final String NAME = "com.orelogo.relink.NAME";
     static final String LAST_CONNECT = "com.orelogo.relink.LAST_CONNECT";
@@ -50,7 +51,7 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -170,42 +171,12 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
     }
 
     /**
-     * Load add contact activity.
+     * Load add reminder activity.
      *
      * @param view view that was clicked
      */
-    public void addContact(View view) {
-        Intent intent = new Intent(this, AddContact.class);
-        startActivity(intent);
-    }
-
-
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-
-        Cursor cursor = (Cursor) getListView().getItemAtPosition(position);
-
-        // get information about contact
-        int rowId = cursor.getInt(DBAdapter.COL_ID_INDEX);
-        String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
-        long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
-        long nextConnect = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
-        double connectInterval = cursor.getDouble(DBAdapter.COL_CONNECT_INTERVAL_INDEX);
-        char timeScale = cursor.getString(DBAdapter.COL_TIME_SCALE_INDEX).charAt(0);
-
-        cursor.close();
-
-        Intent intent = new Intent(this, EditContact.class);
-
-        // pass contact information into intent
-        intent.putExtra(ROW_ID, rowId);
-        intent.putExtra(NAME, name);
-        intent.putExtra(LAST_CONNECT, lastConnect);
-        intent.putExtra(NEXT_CONNECT, nextConnect);
-        intent.putExtra(CONNECT_INTERVAL, connectInterval);
-        intent.putExtra(TIME_SCALE, timeScale);
-
+    public void addReminder(View view) {
+        Intent intent = new Intent(this, AddReminder.class);
         startActivity(intent);
     }
 
@@ -241,9 +212,40 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
             }
         });
 
-        ListView listView = getListView();
+        final ListView listView = (ListView) findViewById(R.id.reminder_list_view);
         listView.setAdapter(adapter);
-    }
+
+        // listener for when user clicks on a reminder in the list view
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+
+                // get information about reminder
+                int rowId = cursor.getInt(DBAdapter.COL_ID_INDEX);
+                String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
+                long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
+                long nextConnect = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
+                double connectInterval = cursor.getDouble(DBAdapter.COL_CONNECT_INTERVAL_INDEX);
+                String timeScale = cursor.getString(DBAdapter.COL_TIME_SCALE_INDEX);
+
+                cursor.close();
+
+                Intent intent = new Intent(MainActivity.this, EditReminder.class);
+
+                // pass reminder information into intent
+                intent.putExtra(ROW_ID, rowId);
+                intent.putExtra(NAME, name);
+                intent.putExtra(LAST_CONNECT, lastConnect);
+                intent.putExtra(NEXT_CONNECT, nextConnect);
+                intent.putExtra(CONNECT_INTERVAL, connectInterval);
+                intent.putExtra(TIME_SCALE, timeScale);
+
+                startActivity(intent);
+            }
+        });
+        }
 
     /**
      * Get the amount of time remaining (in years, months, weeks, or days) until you need to
@@ -251,10 +253,10 @@ public class MainActivity extends ListActivity implements LoaderManager.LoaderCa
      *
      * @param nextConnect time when to connect, in unix time
      * @return time remaining when to connect
-     */
+     * */
     private String getTimeRemaining(long nextConnect) {
         double timeRemaining = 0; // number of years, months, weeks, or days remaining
-        char timeScale = 'x';     // scale of time, ie. y year, m month, w week, or d day
+        String timeScale = "x";     // scale of time, ie. y year, m month, w week, or d day
 
         // amount of milliseconds remaining from right now
         double msRemaining = nextConnect - System.currentTimeMillis();

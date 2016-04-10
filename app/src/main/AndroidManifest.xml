@@ -19,8 +19,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddContact"
-            android:label="@string/title_activity_add_contact"
+            android:name=".AddReminder"
+            android:label="@string/title_activity_add_reminder"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -28,8 +28,8 @@
                 android:value="com.orelogo.relink.MainActivity" />
         </activity>
         <activity
-            android:name=".EditContact"
-            android:label="@string/title_activity_edit_contact"
+            android:name=".EditReminder"
+            android:label="@string/title_activity_edit_reminder"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

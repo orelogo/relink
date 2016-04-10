@@ -16,7 +16,7 @@ import android.widget.TextView;
 /**
  * Activity for adding a new contact to the app.
  */
-public class AddContact extends AppCompatActivity {
+public class AddReminder extends AppCompatActivity {
 
     private Spinner timeScaleSpinner; // spinner for selecting time scale
     private final int PICK_CONTACT_REQUEST = 1;  // request code for picking a contact via Intent
@@ -24,7 +24,7 @@ public class AddContact extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_contact);
+        setContentView(R.layout.activity_add_reminder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         loadSpinner();
@@ -118,10 +118,10 @@ public class AddContact extends AppCompatActivity {
 
             // get time in milliseconds based on user selected time scale spinner
             long time_ms; // time in a day, week, month, or year (in ms)
-            char timeScale; // time scale to be used with interval value
-            String timeScaleValue = timeScaleSpinner.getSelectedItem().toString();
+            String timeScale; // time scale to be used with interval value
+            String spinnerValue = timeScaleSpinner.getSelectedItem().toString();
 
-            switch (timeScaleValue) {
+            switch (spinnerValue) {
                 case "Days":
                     time_ms = MainActivity.DAY_MS;
                     timeScale = MainActivity.DAYS;
@@ -140,7 +140,7 @@ public class AddContact extends AppCompatActivity {
                     break;
                 default: // an error occurred
                     time_ms = 0;
-                    timeScale = 'x';
+                    timeScale = "x";
                     break;
             }
 
@@ -152,8 +152,7 @@ public class AddContact extends AppCompatActivity {
             // add name and next connect time to database
             DBAdapter db = new DBAdapter(this); // database adapter for interacting with database
             db.open();
-            String timeScaleString = String.valueOf(timeScale);
-            db.insertRow(name, currentTime, nextConnect, connectInterval, timeScaleString);
+            db.insertRow(name, currentTime, nextConnect, connectInterval, timeScale);
             db.close();
             finish(); // finish activity
         }
@@ -169,7 +168,7 @@ public class AddContact extends AppCompatActivity {
     private boolean isInputValid() {
 
         // field to display error message
-        TextView errorField = (TextView) findViewById(R.id.add_contact_error);
+        TextView errorField = (TextView) findViewById(R.id.error);
         String errorText = ""; // error message
 
         // check if user supplied a name
@@ -206,4 +205,5 @@ public class AddContact extends AppCompatActivity {
             return false;
         }
     }
+
 }

@@ -23,5 +23,6 @@
         android:layout_weight="0"
         android:gravity="right"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="5dp" />
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="10dp" />
 </LinearLayout>

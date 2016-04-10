@@ -14,7 +14,7 @@ public class DBAdapter {
         dbHelper = new DBHelper(context);
     }
 
-    static final String TABLE_NAME = "contacts";          // table name
+    static final String TABLE_NAME = "reminders";          // table name
     static final String COL_ID = "_id";                   // id column
     static final String COL_NAME = "name";                // contact name
     static final String COL_LAST_CONNECT = "lastConnect"; // date of last connection
@@ -72,6 +72,8 @@ public class DBAdapter {
      * @param name contact name
      * @param lastConnect time of last connect, in unix time
      * @param nextConnect time of when to connect next, in unix time
+     * @param connectInterval interval of how often to connect
+     * @param timeScale time scale of how often to connect
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     long insertRow(String name, long lastConnect, long nextConnect, double connectInterval,
@@ -87,11 +89,35 @@ public class DBAdapter {
     }
 
     /**
+     * Update row based on row ID.
+     *
+     * @param rowId row ID
+     * @param name contact name
+     * @param lastConnect time of last connect, in unix time
+     * @param nextConnect time of when to connect next, in unix time
+     * @param connectInterval interval of how often to connect
+     * @param timeScale time scale of how often to connect
+     * @return true if at least one row was modified
+     */
+    boolean updateRow(long rowId, String name, long lastConnect, long nextConnect, double connectInterval,
+                      String timeScale) {
+        ContentValues values = new ContentValues();
+        values.put(COL_NAME, name);
+        values.put(COL_LAST_CONNECT, lastConnect);
+        values.put(COL_NEXT_CONNECT, nextConnect);
+        values.put(COL_CONNECT_INTERVAL, connectInterval);
+        values.put(COL_TIME_SCALE, timeScale);
+
+        String where = COL_ID + "=" + rowId; // where clause
+
+        return db.update(TABLE_NAME, values, where, null) != 0;
+    }
+
+    /**
      * Delete row.
      *
      * @param rowId row ID
-     * @return the number of rows affected if a whereClause is passed in, 0 otherwise.
-     *         To remove all rows and get a count pass "1" as the whereClause.
+     * @return true if at least one row was deleted
      */
     boolean deleteRow(long rowId) {
         String where = COL_ID + "=" + rowId;
@@ -124,7 +150,7 @@ public class DBAdapter {
      */
     private class DBHelper extends SQLiteOpenHelper {
 
-        public static final int DATABASE_VERSION = 2; // increase value when changing database
+        public static final int DATABASE_VERSION = 3; // increase value when changing database
         public static final String DATABASE_NAME = "relink.db";
 
         DBHelper(Context context) {

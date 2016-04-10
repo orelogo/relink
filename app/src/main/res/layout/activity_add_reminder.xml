@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.orelogo.relink.EditContact">
+    tools:context=".AddReminder">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,6 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_edit_contact" />
+    <include layout="@layout/content_add_reminder" />
 
 </android.support.design.widget.CoordinatorLayout>
