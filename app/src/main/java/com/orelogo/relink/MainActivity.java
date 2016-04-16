@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     DBAdapter db = new DBAdapter(this); // assign database adapter
     SimpleCursorAdapter adapter; // adapter to populate ListView with database data
     private static final int CONTACTS_LOADER = 0; // identifies loader being used
-    private static final int NOTIFICATION_ID = 0; // notification id
 
     static final long YEAR_MS = 31_557_600_000L; // milliseconds in an average year (assuming 365.25 days)
     // milliseconds in an average month (assuming 365.25/12 days)

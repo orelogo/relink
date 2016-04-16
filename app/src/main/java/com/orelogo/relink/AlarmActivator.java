@@ -43,9 +43,17 @@ public class AlarmActivator extends BroadcastReceiver {
 
         Calendar calendar = Calendar.getInstance(); // time when alarm starts
 
+//        calendar.set(Calendar.SECOND, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.HOUR, 10);
+//        calendar.set(Calendar.AM_PM, Calendar.AM);
+
+        long repeatTime = 1000 * 5;
+//        repeatTime *= 60 * 60 * 12;
+
         // set alarm
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(
-                AlarmManager.RTC, calendar.getTimeInMillis() + 3_000, 10_000, pendingIntent);
+                AlarmManager.RTC, calendar.getTimeInMillis(), repeatTime, pendingIntent);
     }
 }

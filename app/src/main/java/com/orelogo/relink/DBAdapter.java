@@ -49,6 +49,9 @@ public class DBAdapter {
     private static final String SQL_DELETE_ENTRIES =
         "DROP TABLE IF EXISTS " + TABLE_NAME;
 
+    // order rows by next connect time
+    private static final String ORDER_NEXT_CONNECT = COL_NEXT_CONNECT + " ASC";
+
     private SQLiteDatabase db;
     private DBHelper dbHelper;
 
@@ -64,6 +67,36 @@ public class DBAdapter {
      */
     void close() {
         dbHelper.close();
+    }
+
+    /**
+     * Get cursor with all rows and columns.
+     *
+     * @return cursor with all rows and columns
+     */
+    Cursor getAllRows() {
+        Cursor c = db.query(true, TABLE_NAME, ALL_COL, null, null, null, null, ORDER_NEXT_CONNECT, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+
+    /**
+     * Get cursor with all rows before time, in unix time.
+     *
+     * @param time time in unix time
+     * @return cursor with all rows before time
+     */
+    Cursor getRowsBefore(long time) {
+        // select rows that occur before time
+        String selection = COL_NEXT_CONNECT + " < " + time;
+        Cursor c = db.query(
+                true, TABLE_NAME, ALL_COL, selection, null, null, null, ORDER_NEXT_CONNECT, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
     }
 
     /**
@@ -129,20 +162,6 @@ public class DBAdapter {
      */
     void deleteAll() {
         db.delete(TABLE_NAME, null, null);
-    }
-
-    /**
-     * Get cursor with all rows and columns.
-     *
-     * @return cursor with all rows and columns
-     */
-    Cursor getAllRows() {
-        String orderBy = COL_NEXT_CONNECT + " ASC"; // order cursor by nextConnect time
-        Cursor c = db.query(true, TABLE_NAME, ALL_COL, null, null, null, null, orderBy, null);
-        if (c != null) {
-            c.moveToFirst();
-        }
-        return c;
     }
 
     /**
