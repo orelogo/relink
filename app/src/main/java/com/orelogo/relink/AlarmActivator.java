@@ -39,17 +39,17 @@ public class AlarmActivator extends BroadcastReceiver {
         // intent to start NotificationPublisher
         Intent intent = new Intent(context, NotificationPublisher.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, NOTIFICATION_ALARM, intent, 0);
+                context, NOTIFICATION_ALARM, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar calendar = Calendar.getInstance(); // time when alarm starts
 
-//        calendar.set(Calendar.SECOND, 0);
-//        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
 //        calendar.set(Calendar.HOUR, 10);
 //        calendar.set(Calendar.AM_PM, Calendar.AM);
 
-        long repeatTime = 1000 * 5;
-//        repeatTime *= 60 * 60 * 12;
+        long repeatTime = 1000;
+        repeatTime *= 60 * 60;
 
         // set alarm
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(context.ALARM_SERVICE);

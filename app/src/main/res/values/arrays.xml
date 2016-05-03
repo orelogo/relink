@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Add reminder-->
+    <string-array name="time_scale_array">
+        <item>days</item>
+        <item>weeks</item>
+        <item>months</item>
+        <item>years</item>
+    </string-array>
+
+    <!--Settings-->
+    <string-array name="notify_interval_entries">
+        <item>daily</item>
+        <item>weekly</item>
+        <item>monthly</item>
+    </string-array>
+    <string-array name="time_scale_values">
+        <item>d</item>
+        <item>w</item>
+        <item>m</item>
+        <item>y</item>
+    </string-array>
+    <string-array name="time_scale_plural">
+        <item>days</item>
+        <item>weeks</item>
+        <item>months</item>
+        <item>years</item>
+    </string-array>
+    <string-array name="time_scale_singular">
+        <item>day</item>
+        <item>week</item>
+        <item>month</item>
+        <item>year</item>
+    </string-array>
+
+</resources>

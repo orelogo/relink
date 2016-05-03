@@ -1,18 +1,36 @@
 <resources>
+    <!--Main-->
     <string name="app_name">Relink</string>
     <string name="action_settings">Settings</string>
-    <string name="contact_name">Name</string>
-    <string name="submit_button">Add Reminder</string>
-    <string name="view_button">View database</string>
     <string name="clear_table">Clear table</string>
+    <string name="view_button">View database</string>
+
+    <!--Add Reminder-->
     <string name="title_activity_add_reminder">Add Reminder</string>
+    <string name="contact_name">Name</string>
     <string name="from_contacts">Search Contacts</string>
     <string name="connect_every">Connect every</string>
-    <string-array name="time_scale_array">
-        <item>Days</item>
-        <item>Weeks</item>
-        <item>Months</item>
-        <item>Years</item>
-    </string-array>
+    <string name="submit_button">Add Reminder</string>
+
+    <!--Edit Reminder-->
     <string name="title_activity_edit_reminder">Edit Reminder</string>
+    <string name="connected_button">Connected</string>
+    <string name="delay_button">Delay 1 Week</string>
+    <string name="delete_button">Delete</string>
+
+    <!--Settings-->
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="notify_interval">Notify me</string>
+    <string name="notify_interval_summary">%s</string>
+    <string name="notify_interval_default">w</string>
+
+    <string name="time_scale_title">Default reconnect time scale</string>
+    <string name="time_number_title">Default reconnect time number</string>
+
+    <string name="delay_button_title">Delay button</string>
+    <string name="delay_button_summary">1 %s</string>
+    <string name="delay_button_dialog">Delay 1</string>
+
+
 </resources>

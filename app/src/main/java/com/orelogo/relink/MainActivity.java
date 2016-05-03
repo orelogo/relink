@@ -307,4 +307,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return timeRemainingFinal;
     }
 
+    public void settings(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Convert a time scale shorthands of d, w, m, y to the long form of days, weeks, months, years.
+     *
+     * @param shorthand shorthand of time scale
+     * @param isPlural true if output should be plural
+     * @return long form of time scale
+     */
+    static String getTimeScaleLong(String shorthand, boolean isPlural) {
+
+        String timeScale;
+
+        switch (shorthand) {
+            case DAYS:
+                timeScale = "day";
+            case WEEKS:
+                timeScale = "week";
+            case MONTHS:
+                timeScale = "month";
+            case YEARS:
+                timeScale = "year";
+            default:
+                timeScale = "error";
+        }
+
+        if (isPlural) {
+            timeScale += "s";
+        }
+
+        return timeScale;
+    }
+
 }

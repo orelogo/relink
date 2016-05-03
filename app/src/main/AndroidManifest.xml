@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.orelogo.relink">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -38,12 +38,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.orelogo.relink.MainActivity" />
         </activity>
+
         <receiver android:name=".NotificationPublisher" />
         <receiver android:name=".AlarmActivator">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings">
+
+        </activity>
     </application>
 
 </manifest>

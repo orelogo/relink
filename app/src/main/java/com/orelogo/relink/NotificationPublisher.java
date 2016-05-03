@@ -51,6 +51,7 @@ public class NotificationPublisher extends BroadcastReceiver {
                     0, PendingIntent.FLAG_UPDATE_CURRENT);
 
             notificationBuilder.setContentIntent(pendingIntent);
+            notificationBuilder.setAutoCancel(true); // cancel intent when user clicks
 
             // publish  notification
             notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
@@ -77,14 +78,15 @@ public class NotificationPublisher extends BroadcastReceiver {
 
         int dueCount = cursor.getCount();
 
-        if (cursor != null && dueCount > 0) { // at least one reminder is due
+        if (dueCount > 0) { // at least one reminder is due
             String reminder = "Reconnect with ";
             reminder += cursor.getString(DBAdapter.COL_NAME_INDEX);
 
             if (dueCount > 1) { // more than one reminder is due
-                reminder += " and ";
-                reminder += dueCount - 1;
-                reminder += " others";
+                reminder += String.format(" and %d other", dueCount - 1);
+            }
+            if (dueCount > 2) {
+                reminder += "s";
             }
             cursor.close();
             return reminder;

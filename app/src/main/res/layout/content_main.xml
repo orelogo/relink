@@ -31,6 +31,14 @@
         android:text="@string/clear_table"
         android:onClick="clearTable" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:id="@+id/settings"
+        android:onClick="settings"
+        android:nestedScrollingEnabled="false" />
+
     <TextView android:id="@+id/database_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
