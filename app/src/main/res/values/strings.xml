@@ -12,6 +12,9 @@
     <string name="connect_every">Connect every</string>
     <string name="submit_button">Add Reminder</string>
 
+    <string name="valid_name">Please enter a valid name.</string>
+    <string name="valid_number">Please enter a valid number.</string>
+
     <!--Edit Reminder-->
     <string name="title_activity_edit_reminder">Edit Reminder</string>
     <string name="connected_button">Connected</string>
@@ -23,14 +26,18 @@
 
     <string name="notify_interval">Notify me</string>
     <string name="notify_interval_summary">%s</string>
-    <string name="notify_interval_default">w</string>
+    <string name="week_default">w</string>
 
     <string name="time_scale_title">Default reconnect time scale</string>
     <string name="time_number_title">Default reconnect time number</string>
+    <string name="time_number_default">4</string>
 
     <string name="delay_button_title">Delay button</string>
     <string name="delay_button_summary">1 %s</string>
-    <string name="delay_button_dialog">Delay 1</string>
+    <string name="delay_1">Delay 1</string>
+
+    <string name="reconnect_every">Reconnect every</string>
+
 
 
 </resources>

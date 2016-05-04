@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Database adapter for interacting with databse.
+ * Database adapter for interacting with database.
  */
 public class DBAdapter {
     public DBAdapter(Context context) {

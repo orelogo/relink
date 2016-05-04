@@ -14,13 +14,13 @@
         android:dialogTitle="Notify me"
         android:entries="@array/notify_interval_entries"
         android:entryValues="@array/time_scale_values"
-        android:defaultValue="@string/notify_interval_default" />
+        android:defaultValue="@string/week_default" />
 
     <EditTextPreference
         android:key="defaultTimeNumber"
         android:title="@string/time_number_title"
         android:inputType="numberDecimal"
-        android:defaultValue="4" />
+        android:defaultValue="@string/time_number_default" />
 
     <ListPreference
         android:key="defaultTimeScale"
@@ -33,7 +33,7 @@
         android:key="defaultDelay"
         android:title="@string/delay_button_title"
         android:summary="@string/delay_button_summary"
-        android:dialogTitle="@string/delay_button_dialog"
+        android:dialogTitle="@string/delay_1"
         android:entries="@array/time_scale_singular"
         android:entryValues="@array/time_scale_values"
         android:defaultValue="w" />

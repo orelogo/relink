@@ -26,18 +26,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     SimpleCursorAdapter adapter; // adapter to populate ListView with database data
     private static final int CONTACTS_LOADER = 0; // identifies loader being used
 
-    static final long YEAR_MS = 31_557_600_000L; // milliseconds in an average year (assuming 365.25 days)
-    // milliseconds in an average month (assuming 365.25/12 days)
-    static final long MONTH_MS = 2_629_800_000L;
-    static final int WEEK_MS = 604_800_000; // milliseconds in a week
-    static final int DAY_MS = 86_400_000;   // milliseconds in a day
-
-    // time scale constants
-    static final String DAYS = "d";
-    static final String WEEKS = "w";
-    static final String MONTHS = "m";
-    static final String YEARS = "y";
-
     // for passing reminder information in an intent
     static final String ROW_ID = "com.orelogo.relink.ROW_ID";
     static final String NAME = "com.orelogo.relink.NAME";
@@ -45,8 +33,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     static final String NEXT_CONNECT = "com.orelogo.relink.NEXT_CONNECT";
     static final String CONNECT_INTERVAL = "com.orelogo.relink.CONNECT_INTERVAL";
     static final String TIME_SCALE = "com.orelogo.relink.TIME_SCALE";
-
-    private int countRemindersDue = 0; // counts how many reminders are currently due
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -264,33 +250,33 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         double msRemaining = nextConnect - System.currentTimeMillis();
 
         // extract number of years, months, and weeks
-        if (msRemaining >= YEAR_MS) {
-            timeScale = YEARS;
-            timeRemaining = (msRemaining / YEAR_MS);
+        if (msRemaining >= Convert.YEAR_MS) {
+            timeScale = Convert.YEARS_CHAR;
+            timeRemaining = (msRemaining / Convert.YEAR_MS);
             // round to ones column
             timeRemaining = Math.round(timeRemaining);
         }
-        else if (msRemaining >= MONTH_MS) {
-            timeScale = MONTHS;
-            timeRemaining = (msRemaining / MONTH_MS);
+        else if (msRemaining >= Convert.MONTH_MS) {
+            timeScale = Convert.MONTHS_CHAR;
+            timeRemaining = (msRemaining / Convert.MONTH_MS);
             timeRemaining = Math.round(timeRemaining);
             if (timeRemaining >= 12){
                 timeRemaining = 1;
-                timeScale = YEARS;
+                timeScale = Convert.YEARS_CHAR;
             }
         }
-        else if (msRemaining >= WEEK_MS) {
-            timeScale = WEEKS;
-            timeRemaining = (msRemaining / WEEK_MS);
+        else if (msRemaining >= Convert.WEEK_MS) {
+            timeScale = Convert.WEEKS_CHAR;
+            timeRemaining = (msRemaining / Convert.WEEK_MS);
             timeRemaining = Math.round(timeRemaining);
         }
-        else if (msRemaining >= DAY_MS) {
-            timeRemaining = (msRemaining / DAY_MS);
-            timeScale = DAYS;
+        else {
+            timeRemaining = (msRemaining / Convert.DAY_MS);
+            timeScale = Convert.DAYS_CHAR;
             timeRemaining = Math.round(timeRemaining);
             if (timeRemaining >= 7){
                 timeRemaining = 1;
-                timeScale = WEEKS;
+                timeScale = Convert.WEEKS_CHAR;
             }
         }
 
@@ -301,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         else {
             timeRemainingFinal = "due";
-            countRemindersDue += 1;        // increase count of reminders due
         }
 
         return timeRemainingFinal;
@@ -310,37 +295,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void settings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
-    }
-
-    /**
-     * Convert a time scale shorthands of d, w, m, y to the long form of days, weeks, months, years.
-     *
-     * @param shorthand shorthand of time scale
-     * @param isPlural true if output should be plural
-     * @return long form of time scale
-     */
-    static String getTimeScaleLong(String shorthand, boolean isPlural) {
-
-        String timeScale;
-
-        switch (shorthand) {
-            case DAYS:
-                timeScale = "day";
-            case WEEKS:
-                timeScale = "week";
-            case MONTHS:
-                timeScale = "month";
-            case YEARS:
-                timeScale = "year";
-            default:
-                timeScale = "error";
-        }
-
-        if (isPlural) {
-            timeScale += "s";
-        }
-
-        return timeScale;
     }
 
 }

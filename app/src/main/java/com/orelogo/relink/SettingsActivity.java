@@ -3,7 +3,9 @@ package com.orelogo.relink;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-
+/**
+ * Activity for containing settings fragment.
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     @Override

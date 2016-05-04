@@ -1,7 +1,9 @@
 package com.orelogo.relink;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -30,6 +32,7 @@ public class EditReminder extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         displayReminderData();
+        loadDelayButton();
     }
 
     private void displayReminderData() {
@@ -52,7 +55,7 @@ public class EditReminder extends AppCompatActivity {
     }
 
     /**
-     * Load spinner with selection based on timeScale char.
+     * Load spinner with selection based on timeScale.
      */
     private void loadSpinner(String timeScale) {
         timeScaleSpinner = (Spinner) findViewById(R.id.time_scale_spinner);
@@ -61,26 +64,21 @@ public class EditReminder extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeScaleSpinner.setAdapter(adapter);
 
-        // choose spinner selection based on timeScale value
-        int spinnerSelection;
-        switch (timeScale) {
-            case (MainActivity.DAYS):
-                spinnerSelection = 0;
-                break;
-            case (MainActivity.WEEKS):
-                spinnerSelection = 1;
-                break;
-            case (MainActivity.MONTHS):
-                spinnerSelection = 2;
-                break;
-            case (MainActivity.YEARS):
-                spinnerSelection = 3;
-                break;
-            default: // error occured
-                spinnerSelection = -1;
-                break;
-        }
-        timeScaleSpinner.setSelection(spinnerSelection); // set selection to "Months"
+        // set spinner selection
+        timeScaleSpinner.setSelection(Convert.getSpinnerSelection(timeScale));
+    }
+
+    /**
+     * Load text of delay button based on preferences.
+     */
+    private void loadDelayButton() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String delayTimeScale = Convert.getTimeScaleLong(
+                preferences.getString(SettingsFragment.DEFAULT_DELAY, Convert.WEEKS_CHAR), false);
+        String text = getResources().getString(R.string.delay_1) + " " + delayTimeScale;
+
+        TextView button = (TextView) findViewById(R.id.delay_button);
+        button.setText(text);
     }
 
     public void connected(View view) {
@@ -92,36 +90,36 @@ public class EditReminder extends AppCompatActivity {
                     connectIntervalField.getText().toString());
 
             // get time in milliseconds based on user selected time scale spinner
-            long time_ms; // time in a day, week, month, or year (in ms)
+            long timeMs; // time in a day, week, month, or year (in ms)
             String timeScale; // time scale to be used with interval value
             String spinnerValue = timeScaleSpinner.getSelectedItem().toString();
 
             switch (spinnerValue) {
-                case "Days":
-                    time_ms = MainActivity.DAY_MS;
-                    timeScale = MainActivity.DAYS;
+                case Convert.DAYS_PLURAL:
+                    timeMs = Convert.DAY_MS;
+                    timeScale = Convert.DAYS_CHAR;
                     break;
-                case "Weeks":
-                    time_ms = MainActivity.WEEK_MS;
-                    timeScale = MainActivity.WEEKS;
+                case Convert.WEEKS_PLURAL:
+                    timeMs = Convert.WEEK_MS;
+                    timeScale = Convert.WEEKS_CHAR;
                     break;
-                case "Months":
-                    time_ms = MainActivity.MONTH_MS;
-                    timeScale = MainActivity.MONTHS;
+                case Convert.MONTHS_PLURAL:
+                    timeMs = Convert.MONTH_MS;
+                    timeScale = Convert.MONTHS_CHAR;
                     break;
-                case "Years":
-                    time_ms = MainActivity.YEAR_MS;
-                    timeScale = MainActivity.YEARS;
+                case Convert.YEARS_PLURAL:
+                    timeMs = Convert.YEAR_MS;
+                    timeScale = Convert.YEARS_CHAR;
                     break;
                 default: // an error occurred
-                    time_ms = 0;
+                    timeMs = 0;
                     timeScale = "x";
                     break;
             }
 
             // calculate time to next connect
             long currentTime =  System.currentTimeMillis();
-            long intervalTime = (long) Math.floor(connectInterval * time_ms);
+            long intervalTime = (long) Math.floor(connectInterval * timeMs);
             long nextConnect = currentTime + intervalTime;// time for next connect (in milliseconds)
 
             // add name and next connect time to database
@@ -148,11 +146,11 @@ public class EditReminder extends AppCompatActivity {
         try {
             Double connectInterval = Double.parseDouble(connectIntervalField.getText().toString());
             if (connectInterval < 0) {
-                errorText += "Please enter a valid number.";
+                errorText += getResources().getString(R.string.valid_number);
             }
         }
         catch (NumberFormatException e) { // occurs if no value is entered
-            errorText += "Please enter a valid number.";
+            errorText += getResources().getString(R.string.valid_number);
         }
 
         if (errorText.length() == 0) {
@@ -177,21 +175,27 @@ public class EditReminder extends AppCompatActivity {
     }
 
     /**
-     * Delay reminder by 1 week.
+     * Delay reminder by 1 day/week/month/year, depending on preferences.
      */
     public void delayReminder(View view) {
 
         long delayedNextConnect; // unix time for delayed next connect time
 
+
         long currentTime =  System.currentTimeMillis();
-        if (nextConnect > currentTime) { // if reinder is now due yet
+        if (nextConnect > currentTime) { // if reminder is not due yet
             delayedNextConnect = nextConnect;
         }
         else {                           // reminder is already due
             delayedNextConnect = currentTime;
         }
 
-        delayedNextConnect += MainActivity.WEEK_MS;
+        // get delay button time scale from preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultDelay = preferences.getString(
+                SettingsFragment.DEFAULT_DELAY, Convert.WEEKS_CHAR);
+
+        delayedNextConnect += Convert.getMillisec(defaultDelay);
 
         // add name and next connect time to database
         db.open();

@@ -1,9 +1,11 @@
 package com.orelogo.relink;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 /**
- * Activity for adding a new contact to the app.
+ * Activity for adding a new reminder to the app.
  */
 public class AddReminder extends AppCompatActivity {
 
@@ -27,6 +29,7 @@ public class AddReminder extends AppCompatActivity {
         setContentView(R.layout.activity_add_reminder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        loadConnectInterval();
         loadSpinner();
     }
 
@@ -49,7 +52,26 @@ public class AddReminder extends AppCompatActivity {
                 this, R.array.time_scale_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeScaleSpinner.setAdapter(adapter);
-        timeScaleSpinner.setSelection(2);    // set selection to "Months"
+
+        // set spinner selection based on preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String timeScale = preferences.getString(
+                SettingsFragment.DEFAULT_TIME_SCALE, Convert.MONTHS_CHAR);
+        int spinnerSelection = Convert.getSpinnerSelection(timeScale);
+
+        timeScaleSpinner.setSelection(spinnerSelection);
+    }
+
+    /**
+     * Load connect interval field based on shared preferences.
+     */
+    private void loadConnectInterval() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String timeNumber = preferences.getString(
+                SettingsFragment.DEFAULT_TIME_NUMBER, "4");
+
+        EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
+        connectIntervalField.setText(timeNumber);
     }
 
     /**
@@ -100,11 +122,11 @@ public class AddReminder extends AppCompatActivity {
     }
 
     /**
-     * Add contact information to database.
+     * Add reminder information to database.
      *
      * @param view view that was clicked
      */
-    public void addContact(View view) {
+    public void addReminder(View view) {
 
         if (isInputValid()) {
             // get name from user
@@ -117,36 +139,36 @@ public class AddReminder extends AppCompatActivity {
                     connectIntervalField.getText().toString());
 
             // get time in milliseconds based on user selected time scale spinner
-            long time_ms; // time in a day, week, month, or year (in ms)
+            long timeMs; // time in a day, week, month, or year (in ms)
             String timeScale; // time scale to be used with interval value
             String spinnerValue = timeScaleSpinner.getSelectedItem().toString();
 
             switch (spinnerValue) {
-                case "Days":
-                    time_ms = MainActivity.DAY_MS;
-                    timeScale = MainActivity.DAYS;
+                case Convert.DAYS_PLURAL:
+                    timeMs = Convert.DAY_MS;
+                    timeScale = Convert.DAYS_CHAR;
                     break;
-                case "Weeks":
-                    time_ms = MainActivity.WEEK_MS;
-                    timeScale = MainActivity.WEEKS;
+                case Convert.WEEKS_PLURAL:
+                    timeMs = Convert.WEEK_MS;
+                    timeScale = Convert.WEEKS_CHAR;
                     break;
-                case "Months":
-                    time_ms = MainActivity.MONTH_MS;
-                    timeScale = MainActivity.MONTHS;
+                case Convert.MONTHS_PLURAL:
+                    timeMs = Convert.MONTH_MS;
+                    timeScale = Convert.MONTHS_CHAR;
                     break;
-                case "Years":
-                    time_ms = MainActivity.YEAR_MS;
-                    timeScale = MainActivity.YEARS;
+                case Convert.YEARS_PLURAL:
+                    timeMs = Convert.YEAR_MS;
+                    timeScale = Convert.YEARS_CHAR;
                     break;
                 default: // an error occurred
-                    time_ms = 0;
+                    timeMs = 0;
                     timeScale = "x";
                     break;
             }
 
             // calculate time to next connect
             long currentTime =  System.currentTimeMillis();
-            long intervalTime = (long) Math.floor(connectInterval * time_ms);
+            long intervalTime = (long) Math.floor(connectInterval * timeMs);
             long nextConnect = currentTime + intervalTime;// time for next connect (in milliseconds)
 
             // add name and next connect time to database
@@ -175,7 +197,7 @@ public class AddReminder extends AppCompatActivity {
         EditText nameField = (EditText) findViewById(R.id.name);
         String name = nameField.getText().toString();
         if (name.length() == 0 ) {
-            errorText += "Please enter a name.";
+            errorText += getResources().getString(R.string.valid_name);
         }
 
         // check if user supplied a valid number, 0 considered valid
@@ -186,14 +208,14 @@ public class AddReminder extends AppCompatActivity {
                 if (errorText.length() > 0) {
                     errorText += "\n";
                 }
-                errorText += "Please enter a valid number.";
+                errorText += getResources().getString(R.string.valid_number);
             }
         }
         catch (NumberFormatException e) { // occurs if no value is entered
             if (errorText.length() > 0) {
                 errorText += "\n";
             }
-            errorText += "Please enter a valid number.";
+            errorText += getResources().getString(R.string.valid_number);
         }
 
 

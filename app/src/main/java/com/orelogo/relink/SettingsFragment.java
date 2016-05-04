@@ -6,15 +6,14 @@ import android.preference.DialogPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-/**
- * Created by patso on 4/18/2016.
- */
+
 public class SettingsFragment extends PreferenceFragment implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     // strings for accessing preferences
-    private String defaultTimeNumber = "defaultTimeNumber";
-    private String defaultTimeScale = "defaultTimeScale";
+    static final String DEFAULT_TIME_NUMBER = "defaultTimeNumber";
+    static final String DEFAULT_TIME_SCALE = "defaultTimeScale";
+    static final String DEFAULT_DELAY = "defaultDelay";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(defaultTimeNumber) || key.equals(defaultTimeScale)) {
+        if (key.equals(DEFAULT_TIME_NUMBER) || key.equals(DEFAULT_TIME_SCALE)) {
             updateTimeSummaries();
         }
     }
@@ -39,23 +38,24 @@ public class SettingsFragment extends PreferenceFragment implements
      * preferences, based on the current SharedPreferences.
      */
     private void updateTimeSummaries() {
-        SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
 
-        String number = preferences.getString(defaultTimeNumber, "4");
+        String number = preferences.getString(DEFAULT_TIME_NUMBER,
+                getResources().getString(R.string.time_number_default));
         String scale =
-                MainActivity.getTimeScaleLong(preferences.getString(defaultTimeScale, "def"), true);
+                Convert.getTimeScaleLong(preferences.getString(DEFAULT_TIME_SCALE, "def"), true);
 
-        String defaultReminderTime = "Reconnect every " + number + " " + scale;
+        String defaultReminderTime = getResources().getString(R.string.reconnect_every) + " " +
+                number + " " + scale;
 
 
-        DialogPreference pref = (DialogPreference) findPreference(defaultTimeNumber);
+        DialogPreference pref = (DialogPreference) findPreference(DEFAULT_TIME_NUMBER);
         pref.setSummary(defaultReminderTime);
-        pref.setDialogTitle("Reconnect every x " + scale);
+        pref.setDialogTitle(getResources().getString(R.string.reconnect_every) + " x " + scale);
 
-        pref = (DialogPreference) findPreference(defaultTimeScale);
+        pref = (DialogPreference) findPreference(DEFAULT_TIME_SCALE);
         pref.setSummary(defaultReminderTime);
-        pref.setDialogTitle("Reconnect every " + number);
+        pref.setDialogTitle(getResources().getString(R.string.reconnect_every) + " " + number);
 
     }
 }
