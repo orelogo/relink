@@ -3,8 +3,8 @@
 
     <SwitchPreference
         android:key="notify"
-        android:title="Notifications"
-        android:defaultValue="true" />
+        android:title="@string/notify_title"
+        android:defaultValue="@string/notify_default" />
 
     <ListPreference
         android:dependency="notify"
@@ -17,10 +17,10 @@
         android:defaultValue="@string/week_default" />
 
     <EditTextPreference
-        android:key="defaultTimeNumber"
-        android:title="@string/time_number_title"
+        android:key="defaultTimeValue"
+        android:title="@string/time_value_title"
         android:inputType="numberDecimal"
-        android:defaultValue="@string/time_number_default" />
+        android:defaultValue="@string/time_value_default" />
 
     <ListPreference
         android:key="defaultTimeScale"

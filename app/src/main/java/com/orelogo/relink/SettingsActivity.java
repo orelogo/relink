@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 /**
- * Activity for containing settings fragment.
+ * Activity for containing the settings fragment.
  */
 public class SettingsActivity extends AppCompatActivity {
 

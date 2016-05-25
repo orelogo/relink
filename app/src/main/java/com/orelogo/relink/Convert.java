@@ -1,12 +1,13 @@
 package com.orelogo.relink;
 
 /**
- * Created by patso on 5/4/2016.
+ * Variables and methods used by many activities for converting time value and scales to different
+ * formats.
  */
 public class Convert {
 
-
-    static final long YEAR_MS = 31_557_600_000L; // milliseconds in an average year (assuming 365.25 days)
+    // milliseconds in an average year (assuming 365.25 days)
+    static final long YEAR_MS = 31_557_600_000L;
     // milliseconds in an average month (assuming 365.25/12 days)
     static final long MONTH_MS = 2_629_800_000L;
     static final int WEEK_MS = 604_800_000; // milliseconds in a week

@@ -49,7 +49,7 @@ public class AddReminder extends AppCompatActivity {
     private void loadSpinner() {
         timeScaleSpinner = (Spinner) findViewById(R.id.time_scale_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this, R.array.time_scale_array, android.R.layout.simple_spinner_item);
+                this, R.array.time_scale_plural, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeScaleSpinner.setAdapter(adapter);
 
@@ -67,11 +67,11 @@ public class AddReminder extends AppCompatActivity {
      */
     private void loadConnectInterval() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String timeNumber = preferences.getString(
-                SettingsFragment.DEFAULT_TIME_NUMBER, "4");
+        String timeValue = preferences.getString(SettingsFragment.DEFAULT_TIME_VALUE,
+                getResources().getString(R.string.time_value_default));
 
         EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
-        connectIntervalField.setText(timeNumber);
+        connectIntervalField.setText(timeValue);
     }
 
     /**

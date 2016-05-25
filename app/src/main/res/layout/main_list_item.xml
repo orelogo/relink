@@ -9,11 +9,10 @@
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name"
+        android:text="@string/contact_name"
         android:layout_weight="1"
         android:ellipsize="end"
-        android:singleLine="true"
-        android:password="false" />
+        android:singleLine="true"/>
 
     <TextView android:id="@+id/next_connect"
         android:textSize="24sp"

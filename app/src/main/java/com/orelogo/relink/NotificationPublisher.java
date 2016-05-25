@@ -32,13 +32,13 @@ public class NotificationPublisher extends BroadcastReceiver {
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        String reminder = remindersDue(context); // reminder message (or null if no reminders due
+        String reminder = remindersDue(context); // reminder message, or null if no reminders due
 
         if (reminder != null) {
             // build notification
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(context)
-                            .setSmallIcon(R.drawable.ic_person_add_black_36dp)
+                            .setSmallIcon(R.drawable.ic_notification)
                             .setContentTitle("Relink Reminder")
                             .setContentText(reminder);
 

@@ -12,6 +12,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+/**
+ * Activity for editing a reminder.
+ */
 public class EditReminder extends AppCompatActivity {
 
     private DBAdapter db = new DBAdapter(this); // database adapter for interacting with database
@@ -48,6 +51,9 @@ public class EditReminder extends AppCompatActivity {
         TextView nameField = (TextView) findViewById(R.id.name);
         nameField.setText(name);
 
+        TextView nextConnectField = (TextView) findViewById(R.id.next_connect);
+        nextConnectField.setText(MainActivity.getTimeRemaining(nextConnect));
+
         EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
         connectIntervalField.setText(Double.toString(connectInterval));
 
@@ -60,7 +66,7 @@ public class EditReminder extends AppCompatActivity {
     private void loadSpinner(String timeScale) {
         timeScaleSpinner = (Spinner) findViewById(R.id.time_scale_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this, R.array.time_scale_array, android.R.layout.simple_spinner_item);
+                this, R.array.time_scale_plural, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeScaleSpinner.setAdapter(adapter);
 

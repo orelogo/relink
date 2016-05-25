@@ -34,13 +34,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Settings"
-        android:id="@+id/settings"
-        android:onClick="settings"
-        android:nestedScrollingEnabled="false" />
+        android:text="Notify"
+        android:id="@+id/notify"
+        android:onClick="notify"/>
 
     <TextView android:id="@+id/database_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content" />
 
 </LinearLayout>

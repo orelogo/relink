@@ -19,7 +19,10 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
+/**
+ * The main activity for the app which displays a list of reminders of who to reconnect with and
+ * in how long. A floating button can be used to add a new reminder.
+ */
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     DBAdapter db = new DBAdapter(this); // assign database adapter
@@ -40,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        AlarmActivator.createAlarm(this);
+        AlarmActivator.createAlarm(this); // activate alarm for notifications
     }
 
     @Override
@@ -72,10 +75,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+                openSettings();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Open SettingsActivity.
+     */
+    private void openSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -110,55 +122,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * For testing: View database.
-     *
-     * @param view button pressed
-     */
-    public void viewDatabase(View view) {
-
-        TextView databaseView = (TextView) findViewById(R.id.database_view);
-        String databaseItems = "";
-
-        db.open();
-        Cursor cursor = db.getAllRows();
-        db.close();
-
-        if (cursor != null && cursor.getCount() > 0) {
-            do {
-                String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
-                long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
-                long nextConnectMillis = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
-
-                Date nextConnectDate = new Date(nextConnectMillis);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String nextConnect = sdf.format(nextConnectDate);
-
-                databaseItems += name + ", " + nextConnect + "\n";
-            } while (cursor.moveToNext());
-
-            databaseView.setText(databaseItems);
-        }
-        else {
-            databaseView.setText("The table is empty");
-        }
-        cursor.close();
-    }
-
-    /**
-     * For testing: clear database table.
-     *
-     * @param view button pressed
-     */
-    public void clearTable(View view) {
-        db.open();
-        db.deleteAll();
-        db.close();
-        getLoaderManager().restartLoader(CONTACTS_LOADER, null, this);
-        TextView databaseView = (TextView) findViewById(R.id.database_view);
-        databaseView.setText("Cleared table!");
-    }
-
-    /**
      * Load add reminder activity.
      *
      * @param view view that was clicked
@@ -169,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * Load list view.
+     * Load list of current reminder into view.
      */
     private void loadListView() {
 
@@ -242,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * @param nextConnect time when to connect, in unix time
      * @return time remaining when to connect
      * */
-    private String getTimeRemaining(long nextConnect) {
+    static String getTimeRemaining(long nextConnect) {
         double timeRemaining = 0; // number of years, months, weeks, or days remaining
         String timeScale = "x";     // scale of time, ie. y year, m month, w week, or d day
 
@@ -260,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             timeScale = Convert.MONTHS_CHAR;
             timeRemaining = (msRemaining / Convert.MONTH_MS);
             timeRemaining = Math.round(timeRemaining);
-            if (timeRemaining >= 12){
+            if (timeRemaining >= 12){ // convert more than 12 months to years
                 timeRemaining = 1;
                 timeScale = Convert.YEARS_CHAR;
             }
@@ -274,7 +237,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             timeRemaining = (msRemaining / Convert.DAY_MS);
             timeScale = Convert.DAYS_CHAR;
             timeRemaining = Math.round(timeRemaining);
-            if (timeRemaining >= 7){
+            // don't round <0.5 days to 0, necessary so that notification alert matches notifications due
+            if (msRemaining > 0 && timeRemaining == 0) {
+                timeRemaining = 1;
+            }
+            if (timeRemaining >= 7){ // convert more than 7 days to 12 months
                 timeRemaining = 1;
                 timeScale = Convert.WEEKS_CHAR;
             }
@@ -292,9 +259,63 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return timeRemainingFinal;
     }
 
-    public void settings(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+    // ------------------------------ Testing -------------------------------------------
+
+    /**
+     * For testing: View reminders as list of names and due dates.
+     *
+     * @param view button pressed
+     */
+    public void viewDatabase(View view) {
+
+        TextView databaseView = (TextView) findViewById(R.id.database_view);
+        String databaseItems = "";
+
+        db.open();
+        Cursor cursor = db.getAllRows();
+        db.close();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            do {
+                String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
+                long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
+                long nextConnectMillis = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
+
+                Date nextConnectDate = new Date(nextConnectMillis);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String nextConnect = sdf.format(nextConnectDate);
+
+                databaseItems += name + ", " + nextConnect + "\n";
+            } while (cursor.moveToNext());
+
+            databaseView.setText(databaseItems);
+        }
+        else {
+            databaseView.setText("The table is empty");
+        }
+        cursor.close();
+    }
+
+    /**
+     * For testing: Clear database table of all current reminders.
+     *
+     * @param view button pressed
+     */
+    public void clearTable(View view) {
+        db.open();
+        db.deleteAll();
+        db.close();
+        getLoaderManager().restartLoader(CONTACTS_LOADER, null, this);
+        TextView databaseView = (TextView) findViewById(R.id.database_view);
+        databaseView.setText("Cleared table!");
+    }
+
+    /**
+     * For testing: Activate notification.
+     */
+    public void notify(View view) {
+        Intent intent = new Intent(this, NotificationPublisher.class);
+        sendBroadcast(intent);
     }
 
 }
