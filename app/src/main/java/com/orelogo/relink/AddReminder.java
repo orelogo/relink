@@ -1,5 +1,6 @@
 package com.orelogo.relink;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -29,6 +31,11 @@ public class AddReminder extends AppCompatActivity {
         setContentView(R.layout.activity_add_reminder);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // enable up button in app bar
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+
         loadConnectInterval();
         loadSpinner();
     }
@@ -44,22 +51,34 @@ public class AddReminder extends AppCompatActivity {
     }
 
     /**
-     * Load spinner for selecting time scale for input (days, weeks, moths, years).
+     * Load spinner for selecting time scale for input (days, weeks, moths, years) based on
+     * settings.
      */
     private void loadSpinner() {
         timeScaleSpinner = (Spinner) findViewById(R.id.time_scale_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this, R.array.time_scale_plural, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        timeScaleSpinner.setAdapter(adapter);
-
-        // set spinner selection based on preferences
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String timeScale = preferences.getString(
-                SettingsFragment.DEFAULT_TIME_SCALE, Convert.MONTHS_CHAR);
-        int spinnerSelection = Convert.getSpinnerSelection(timeScale);
+                SettingsFragment.DEFAULT_TIME_SCALE, getResources().getString(R.string.week_default));
 
-        timeScaleSpinner.setSelection(spinnerSelection);
+        loadTimeScaleSpinner(this, timeScaleSpinner, timeScale);
+    }
+
+
+    /**
+     * Load time scale spinner with corresponding time scale.
+     *
+     * @param context context where spinner is located
+     * @param spinner the spinner
+     * @param timeScale time scale (d, w, m, or y)
+     */
+    static void loadTimeScaleSpinner(Context context, Spinner spinner, String timeScale) {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                context, R.array.time_scale_plural, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        int spinnerSelection = Convert.getSpinnerSelection(timeScale);
+        spinner.setSelection(spinnerSelection);
     }
 
     /**
@@ -122,7 +141,7 @@ public class AddReminder extends AppCompatActivity {
     }
 
     /**
-     * Add reminder information to database.
+     * Add a new reminder entry into the database.
      *
      * @param view view that was clicked
      */
@@ -139,37 +158,12 @@ public class AddReminder extends AppCompatActivity {
                     connectIntervalField.getText().toString());
 
             // get time in milliseconds based on user selected time scale spinner
-            long timeMs; // time in a day, week, month, or year (in ms)
-            String timeScale; // time scale to be used with interval value
             String spinnerValue = timeScaleSpinner.getSelectedItem().toString();
+            // time scale to be used with interval value
+            String timeScale = Convert.getTimeScaleChar(spinnerValue);
 
-            switch (spinnerValue) {
-                case Convert.DAYS_PLURAL:
-                    timeMs = Convert.DAY_MS;
-                    timeScale = Convert.DAYS_CHAR;
-                    break;
-                case Convert.WEEKS_PLURAL:
-                    timeMs = Convert.WEEK_MS;
-                    timeScale = Convert.WEEKS_CHAR;
-                    break;
-                case Convert.MONTHS_PLURAL:
-                    timeMs = Convert.MONTH_MS;
-                    timeScale = Convert.MONTHS_CHAR;
-                    break;
-                case Convert.YEARS_PLURAL:
-                    timeMs = Convert.YEAR_MS;
-                    timeScale = Convert.YEARS_CHAR;
-                    break;
-                default: // an error occurred
-                    timeMs = 0;
-                    timeScale = "x";
-                    break;
-            }
-
-            // calculate time to next connect
-            long currentTime =  System.currentTimeMillis();
-            long intervalTime = (long) Math.floor(connectInterval * timeMs);
-            long nextConnect = currentTime + intervalTime;// time for next connect (in milliseconds)
+            long currentTime = System.currentTimeMillis();
+            long nextConnect = Convert.getNextConnect(connectInterval, timeScale);
 
             // add name and next connect time to database
             DBAdapter db = new DBAdapter(this); // database adapter for interacting with database
@@ -178,12 +172,10 @@ public class AddReminder extends AppCompatActivity {
             db.close();
             finish(); // finish activity
         }
-
-
     }
 
     /**
-     * Determines if user input is valid.
+     * Determines if user input is valid. If input is invalid, an error message is displayed.
      *
      * @return true if user supplied valid input, otherwise, false
      */
@@ -195,28 +187,14 @@ public class AddReminder extends AppCompatActivity {
 
         // check if user supplied a name
         EditText nameField = (EditText) findViewById(R.id.name);
-        String name = nameField.getText().toString();
-        if (name.length() == 0 ) {
-            errorText += getResources().getString(R.string.valid_name);
-        }
+        errorText += errorName(this, nameField);
 
         // check if user supplied a valid number, 0 considered valid
         EditText connectIntervalField = (EditText) findViewById(R.id.connect_interval);
-        try {
-            Double connectInterval = Double.parseDouble(connectIntervalField.getText().toString());
-            if (connectInterval < 0) {
-                if (errorText.length() > 0) {
-                    errorText += "\n";
-                }
-                errorText += getResources().getString(R.string.valid_number);
-            }
+        if (errorText.length() > 0) {
+            errorText += "\n";
         }
-        catch (NumberFormatException e) { // occurs if no value is entered
-            if (errorText.length() > 0) {
-                errorText += "\n";
-            }
-            errorText += getResources().getString(R.string.valid_number);
-        }
+        errorText += errorTimeValue(this, connectIntervalField);
 
 
         if (errorText.length() == 0) {
@@ -226,6 +204,48 @@ public class AddReminder extends AppCompatActivity {
             errorField.setText(errorText); // display error message
             return false;
         }
+    }
+
+    /**
+     * Checks if the EditText field is a valid name, not empty.
+     *
+     * @param context context
+     * @param nameField field with name
+     * @return error message, empty string if no error
+     */
+    static String errorName(Context context, EditText nameField) {
+        String errorText = ""; // error message
+
+        String name = nameField.getText().toString();
+        if (name.length() == 0 ) {
+            errorText += context.getResources().getString(R.string.valid_name);
+        }
+
+        return errorText;
+    }
+
+    /**
+     * Checks if EditText field is a valid number, > 0.
+     *
+     * @param context context
+     * @param connectIntervalField field with number value
+     * @return error message, empty string if no error
+     */
+    static String errorTimeValue(Context context, EditText connectIntervalField) {
+
+        String errorText = ""; // error message
+
+        try {
+            Double connectInterval = Double.parseDouble(connectIntervalField.getText().toString());
+            if (connectInterval < 0) {
+                errorText += context.getResources().getString(R.string.valid_number);
+            }
+        }
+        catch (NumberFormatException e) { // occurs if no value is entered
+            errorText += context.getResources().getString(R.string.valid_number);
+        }
+
+        return errorText;
     }
 
 }

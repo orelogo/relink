@@ -18,7 +18,6 @@
     <!--Edit Reminder-->
     <string name="title_activity_edit_reminder">Edit Reminder</string>
     <string name="connected_button">Connected</string>
-    <string name="delay_button">Delay 1 Week</string>
     <string name="delete_button">Delete</string>
 
     <!--Settings-->
@@ -31,8 +30,8 @@
     <string name="notify_interval_summary">%s</string>
     <string name="week_default">w</string>
 
-    <string name="time_scale_title">Default reconnect time scale</string>
-    <string name="time_value_title">Default reconnect time value</string>
+    <string name="time_value_title">New reminder time value</string>
+    <string name="time_scale_title">New reminder time scale</string>
     <string name="time_value_default">4</string>
 
     <string name="delay_button_title">Delay button</string>

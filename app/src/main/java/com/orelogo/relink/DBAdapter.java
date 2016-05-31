@@ -15,12 +15,12 @@ public class DBAdapter {
     }
 
     static final String TABLE_NAME = "reminders";          // table name
-    static final String COL_ID = "_id";                   // id column
-    static final String COL_NAME = "name";                // contact name
-    static final String COL_LAST_CONNECT = "lastConnect"; // date of last connection
-    static final String COL_NEXT_CONNECT = "nextConnect"; // date of next connection
+    static final String COL_ID = "_id";                    // id column
+    static final String COL_NAME = "name";                 // contact name
+    static final String COL_LAST_CONNECT = "lastConnect";  // date of last connection
+    static final String COL_NEXT_CONNECT = "nextConnect";  // date of next connection
     static final String COL_CONNECT_INTERVAL = "connectInterval"; // connect interval
-    static final String COL_TIME_SCALE = "timeScale"; // time scale of connect interval
+    static final String COL_TIME_SCALE = "timeScale";      // time scale of connect interval
 
     // column indexes
     static final int COL_ID_INDEX = 0;

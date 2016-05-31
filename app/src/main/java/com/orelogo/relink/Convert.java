@@ -62,6 +62,38 @@ public class Convert {
     }
 
     /**
+     * Convert a time scale plural words: days, weeks, months, and years to shorthands of d, w, m,
+     * and y.
+     *
+     * @param timeScaleLong long form of time scale
+     * @return short hand form of time scale
+     */
+    static String getTimeScaleChar(String timeScaleLong) {
+
+        String timeScaleChar;
+
+        switch (timeScaleLong) {
+            case DAYS_PLURAL:
+                timeScaleChar = DAYS_CHAR;
+                break;
+            case WEEKS_PLURAL:
+                timeScaleChar = WEEKS_CHAR;
+                break;
+            case MONTHS_PLURAL:
+                timeScaleChar = MONTHS_CHAR;
+                break;
+            case YEARS_PLURAL:
+                timeScaleChar = YEARS_CHAR;
+                break;
+            default:
+                timeScaleChar = "x";
+                break;
+        }
+
+        return timeScaleChar;
+    }
+
+    /**
      * Get milliseconds from time scale.
      *
      * @param timeScale d, w, m, or y
@@ -119,5 +151,24 @@ public class Convert {
                 break;
         }
         return spinnerSelection;
+    }
+
+    /**
+     * Get the next connect time, in unix time, based on the connect interval and time scale.
+     *
+     * @param connectInterval connect interval value
+     * @param timeScale time scale of the connect interval
+     * @return next connect time, in unix time
+     */
+    static long getNextConnect(Double connectInterval, String timeScale) {
+        // time in a day, week, month, or year (in ms)
+        long timeMs = Convert.getMillisec(timeScale);
+
+        // calculate time to next connect
+        long currentTime =  System.currentTimeMillis();
+        long intervalTime = (long) Math.floor(connectInterval * timeMs);
+        long nextConnect = currentTime + intervalTime;// unix time for next connect (in millisec)
+
+        return nextConnect;
     }
 }

@@ -261,61 +261,61 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     // ------------------------------ Testing -------------------------------------------
 
-    /**
-     * For testing: View reminders as list of names and due dates.
-     *
-     * @param view button pressed
-     */
-    public void viewDatabase(View view) {
-
-        TextView databaseView = (TextView) findViewById(R.id.database_view);
-        String databaseItems = "";
-
-        db.open();
-        Cursor cursor = db.getAllRows();
-        db.close();
-
-        if (cursor != null && cursor.getCount() > 0) {
-            do {
-                String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
-                long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
-                long nextConnectMillis = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
-
-                Date nextConnectDate = new Date(nextConnectMillis);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String nextConnect = sdf.format(nextConnectDate);
-
-                databaseItems += name + ", " + nextConnect + "\n";
-            } while (cursor.moveToNext());
-
-            databaseView.setText(databaseItems);
-        }
-        else {
-            databaseView.setText("The table is empty");
-        }
-        cursor.close();
-    }
-
-    /**
-     * For testing: Clear database table of all current reminders.
-     *
-     * @param view button pressed
-     */
-    public void clearTable(View view) {
-        db.open();
-        db.deleteAll();
-        db.close();
-        getLoaderManager().restartLoader(CONTACTS_LOADER, null, this);
-        TextView databaseView = (TextView) findViewById(R.id.database_view);
-        databaseView.setText("Cleared table!");
-    }
-
-    /**
-     * For testing: Activate notification.
-     */
-    public void notify(View view) {
-        Intent intent = new Intent(this, NotificationPublisher.class);
-        sendBroadcast(intent);
-    }
+//    /**
+//     * For testing: View reminders as list of names and due dates.
+//     *
+//     * @param view button pressed
+//     */
+//    public void viewDatabase(View view) {
+//
+//        TextView databaseView = (TextView) findViewById(R.id.database_view);
+//        String databaseItems = "";
+//
+//        db.open();
+//        Cursor cursor = db.getAllRows();
+//        db.close();
+//
+//        if (cursor != null && cursor.getCount() > 0) {
+//            do {
+//                String name = cursor.getString(DBAdapter.COL_NAME_INDEX);
+//                long lastConnect = cursor.getLong(DBAdapter.COL_LAST_CONNECT_INDEX);
+//                long nextConnectMillis = cursor.getLong(DBAdapter.COL_NEXT_CONNECT_INDEX);
+//
+//                Date nextConnectDate = new Date(nextConnectMillis);
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//                String nextConnect = sdf.format(nextConnectDate);
+//
+//                databaseItems += name + ", " + nextConnect + "\n";
+//            } while (cursor.moveToNext());
+//
+//            databaseView.setText(databaseItems);
+//        }
+//        else {
+//            databaseView.setText("The table is empty");
+//        }
+//        cursor.close();
+//    }
+//
+//    /**
+//     * For testing: Clear database table of all current reminders.
+//     *
+//     * @param view button pressed
+//     */
+//    public void clearTable(View view) {
+//        db.open();
+//        db.deleteAll();
+//        db.close();
+//        getLoaderManager().restartLoader(CONTACTS_LOADER, null, this);
+//        TextView databaseView = (TextView) findViewById(R.id.database_view);
+//        databaseView.setText("Cleared table!");
+//    }
+//
+//    /**
+//     * For testing: Activate notification.
+//     */
+//    public void notify(View view) {
+//        Intent intent = new Intent(this, NotificationPublisher.class);
+//        sendBroadcast(intent);
+//    }
 
 }
