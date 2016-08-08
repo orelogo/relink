@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!--Settings-->
+    
     <string-array name="notify_interval_entries">
         <item>daily, 8:00 am</item>
         <item>weekly, Monday 8:00 am</item>
-        <item>monthly</item>
+        <item>monthly, 1st day 8:00 am</item>
     </string-array>
     <string-array name="time_scale_values">
         <item>d</item>
@@ -24,6 +23,12 @@
         <item>week</item>
         <item>month</item>
         <item>year</item>
+    </string-array>
+    <string-array name="delay_time_scale">
+        <item>1 day</item>
+        <item>1 week</item>
+        <item>1 month</item>
+        <item>1 year</item>
     </string-array>
 
 </resources>

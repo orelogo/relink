@@ -16,9 +16,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * The main activity for the app which displays a list of reminders of who to reconnect with and
  * in how long. A floating button can be used to add a new reminder.
@@ -43,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        AlarmActivator.createAlarm(this); // activate alarm for notifications
+        AlarmActivator.setAlarm(this);     // activate alarm for notifications
+
     }
 
     @Override

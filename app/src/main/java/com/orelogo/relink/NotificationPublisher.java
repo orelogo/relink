@@ -12,8 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import java.util.Calendar;
-
 /**
  * Publish notification.
  */
@@ -39,7 +37,7 @@ public class NotificationPublisher extends BroadcastReceiver {
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(context)
                             .setSmallIcon(R.drawable.ic_notification)
-                            .setContentTitle("Relink Reminder")
+                            .setContentTitle(context.getString(R.string.notification_title))
                             .setContentText(reminder);
 
             // set intent for when user clicks on notification
@@ -79,14 +77,14 @@ public class NotificationPublisher extends BroadcastReceiver {
         int dueCount = cursor.getCount();
 
         if (dueCount > 0) { // at least one reminder is due
-            String reminder = "Reconnect with ";
-            reminder += cursor.getString(DBAdapter.COL_NAME_INDEX);
+            String firstReconnect = cursor.getString(DBAdapter.COL_NAME_INDEX);
+            String reminder = context.getString(R.string.reconnect_with, firstReconnect);
 
             if (dueCount > 1) { // more than one reminder is due
-                reminder += String.format(" and %d other", dueCount - 1);
+                reminder += context.getString(R.string.other, dueCount - 1);
             }
             if (dueCount > 2) {
-                reminder += "s";
+                reminder += context.getString(R.string.plural_s);
             }
             cursor.close();
             return reminder;

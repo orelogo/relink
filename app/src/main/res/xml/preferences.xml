@@ -9,32 +9,19 @@
     <ListPreference
         android:dependency="notify"
         android:key="notifyInterval"
-        android:title="@string/notify_interval"
-        android:summary="@string/notify_interval_summary"
-        android:dialogTitle="Notify me"
+        android:title="@string/notify_interval_title"
+        android:summary="@string/summary"
+        android:dialogTitle="@string/notify_interval_title"
         android:entries="@array/notify_interval_entries"
         android:entryValues="@array/time_scale_values"
         android:defaultValue="@string/week_default" />
 
-    <EditTextPreference
-        android:key="defaultTimeValue"
-        android:title="@string/time_value_title"
-        android:inputType="numberDecimal"
-        android:defaultValue="@string/time_value_default" />
-
-    <ListPreference
-        android:key="defaultTimeScale"
-        android:title="@string/time_scale_title"
-        android:entries="@array/time_scale_plural"
-        android:entryValues="@array/time_scale_values"
-        android:defaultValue="w" />
-
     <ListPreference
         android:key="defaultDelay"
         android:title="@string/delay_button_title"
-        android:summary="@string/delay_button_summary"
-        android:dialogTitle="@string/delay_1"
-        android:entries="@array/time_scale_singular"
+        android:summary="@string/summary"
+        android:dialogTitle="@string/delay_button_title"
+        android:entries="@array/delay_time_scale"
         android:entryValues="@array/time_scale_values"
         android:defaultValue="w" />
 
