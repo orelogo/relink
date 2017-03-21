@@ -86,7 +86,7 @@ public class AlarmActivator extends BroadcastReceiver {
 
         switch (timeScale) {
             case Convert.DAYS_CHAR: // daily alarm
-                if (time.HOUR_OF_DAY >= alarmHour) {
+                if (time.get(Calendar.HOUR_OF_DAY) >= alarmHour) {
                     time.add(Calendar.DAY_OF_YEAR, 1); // add 1  day
                 }
                 break;
@@ -101,14 +101,14 @@ public class AlarmActivator extends BroadcastReceiver {
                     time.add(Calendar.DAY_OF_YEAR, dayOffset);
                 }
                 else { // Calendar.DAY_OF_WEEK == alarmDay
-                    if (time.HOUR_OF_DAY >= alarmHour) {
+                    if (time.get(Calendar.HOUR_OF_DAY) >= alarmHour) {
                         time.add(Calendar.DAY_OF_YEAR, 7); // add week
                     }
                 }
                 break;
 
             case Convert.MONTHS_CHAR: // monthly alarm
-                if (time.get(Calendar.DAY_OF_MONTH) > 1 || time.HOUR_OF_DAY >= alarmHour) {
+                if (time.get(Calendar.DAY_OF_MONTH) > 1 || time.get(Calendar.HOUR_OF_DAY) >= alarmHour) {
                     time.set(Calendar.DAY_OF_MONTH, 1);
                     time.add(Calendar.MONTH, 1);
                 }
